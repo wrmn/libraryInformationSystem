@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"regexp"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
-	log.Println("Starting")
-
 	logFile := "log.txt"
 
 	err := envReader()
@@ -20,22 +19,33 @@ func init() {
 	}
 
 	logInit(logFile)
-	log.Println(".env file read successfully")
+	infoPrint(3, ".env file read successfully")
 
 	dbAction = flag.String("d", "", "database command.")
-	fileQuery = flag.String("f", "", "file that contain query to run")
+	sysAction = flag.String("r", "", "run action system")
+	tableName = flag.String("t", "", "create table")
+	allCommand = flag.Bool("a", false, "run all query file")
 
 	flag.Parse()
 }
 
 func main() {
-
+	log.Println("Starting Program")
 	if *dbAction != "" {
-		log.Printf("dbAction is \"%s\" ", *dbAction)
+		action := fmt.Sprintf("%s table %s", *dbAction, *tableName)
+		if *allCommand {
+			action = fmt.Sprintf("%s all table", *dbAction)
+		}
+		infoPrint(3, fmt.Sprintf("Command Is \"database\", Action is \"%s\" ", action))
+		databaseAction()
 	}
+}
 
+func databaseAction() {
 	switch *dbAction {
 	case "test":
+		task = "Testing database connection"
+		infoPrint(1, task)
 		db, err := initDb()
 		if err != nil {
 			errFatal(err, "check .env file")
@@ -50,34 +60,62 @@ func main() {
 			break
 		}
 
-		fmt.Println("testing database connection")
-		logAndPrint("database successfully connect")
-	case "run":
-		if *fileQuery == "" {
-			logAndPrint("Need file that contain query to run.")
-			break
-		}
+		infoPrint(2, task)
+		infoPrint(3, "Database connected")
 
-		logAndPrint(fmt.Sprintf("file query  is %s ", *fileQuery))
-		content, err := ioutil.ReadFile(*fileQuery)
-		if err != nil {
-			fmt.Println(err)
-			errFatal(err, "")
-		}
-		logMsg := fmt.Sprintf("query : \n%s", string(content))
-		logAndPrint(logMsg)
-
+	case "create":
 		db, err := initDb()
 		if err != nil {
-			errFatal(err, "check .env file")
+			errFatal(err, "check database connection! Run test!")
 			break
 		}
 		defer db.Close()
 
-		err = runQuery(db, string(content))
-		if err != nil {
-			errFatal(err, "check .env file")
-			break
+		if *tableName != "" {
+			task = fmt.Sprintf("Creating table %s", *tableName)
+			infoPrint(1, task)
+
+			content := readFile(fmt.Sprintf("query/create/%s.sql", *tableName))
+
+			err = runQuery(db, content)
+			if err != nil {
+				errFatal(err, "")
+				break
+			}
+
+			infoPrint(2, task)
+		} else if *allCommand {
+			mainTask := "Running query create for all table"
+			infoPrint(1, mainTask)
+
+			files, err := ioutil.ReadDir("query/create")
+			if err != nil {
+				errFatal(err, "")
+			}
+
+			for _, f := range files {
+				name := f.Name()
+
+				reg, err := regexp.Compile("(.sql)")
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				table := reg.ReplaceAllString(name, "")
+
+				task = fmt.Sprintf("Creating table %s", table)
+				infoPrint(1, task)
+
+				content := readFile(fmt.Sprintf("query/create/%s.sql", table))
+
+				err = runQuery(db, content)
+				if err != nil {
+					errFatal(err, "")
+					break
+				}
+				infoPrint(2, task)
+			}
+			infoPrint(2, mainTask)
 		}
 
 	default:

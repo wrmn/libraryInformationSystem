@@ -25,6 +25,6 @@ func runQuery(db *sql.DB, content string) error {
 
 	defer res.Close()
 
-	logAndPrint("successfully run query")
+	infoPrint(3, "Successfully run query")
 	return nil
 }

@@ -1,8 +1,11 @@
 package main
 
 var (
-	dbAction  *string
-	fileQuery *string
+	dbAction   *string
+	sysAction  *string
+	tableName  *string
+	allCommand *bool
+	task       string
 )
 
 type DbConfig struct {
