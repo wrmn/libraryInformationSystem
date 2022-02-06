@@ -1,16 +1,25 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/bxcodec/faker/v3"
+	"github.com/schollz/progressbar/v3"
 )
+
+//make query for insert data assetRecording
+func (i InsertParam) AssetRecordingSeeder() {
+
+}
 
 //make query for insert data user
 func (i InsertParam) DdcSeeder() {
-	ddc := Ddcs{}
 	var num string
+	bar := progressbar.Default(1000)
+	ddc := Ddc{}
 	category := []string{
 		"karya umum",
 		"filsafat",
@@ -42,11 +51,25 @@ func (i InsertParam) DdcSeeder() {
 		if err != nil {
 			errFatal(err, "")
 		}
+		bar.Add(1)
 	}
-
 }
 
 //make query for insert data user
 func (i InsertParam) UserSeeder() {
-	fmt.Println("called this")
+	user := User{}
+	bar := progressbar.Default(6)
+	t := time.Now().Format("2006-01-02 15:04:05")
+	for c := 0; c < 6; c++ {
+		user.Id = c + 1
+		user.Username = faker.Username()
+		user.Password = fmt.Sprintf("%x", md5.Sum([]byte(faker.Word())))
+		user.CreatedAt, user.LastLogin, user.UpdatedAt = t, t, t
+		query := composeInsert(i.TableName, user)
+		err := runQuery(i.Db, query)
+		if err != nil {
+			errFatal(err, "")
+		}
+		bar.Add(1)
+	}
 }

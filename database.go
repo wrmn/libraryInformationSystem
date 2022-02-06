@@ -31,22 +31,23 @@ func runQuery(db *sql.DB, content string) error {
 
 	defer res.Close()
 
-	infoPrint(3, "Successfully run query")
 	return nil
 }
 
 func composeInsert(db string, field interface{}) string {
 	fieldType := reflect.TypeOf(field)
 	fieldValue := reflect.ValueOf(field)
-	var columns, values, value string
+	var columns, values string
+
 	for i := 0; i < fieldType.NumField(); i++ {
 		column := fieldType.Field(i)
-		value = fieldValue.Field(i).String()
 
 		columns = fmt.Sprintf("%s`%s`", columns, strings.ToLower(column.Name))
-		if column.Type == reflect.TypeOf(value) {
+		if column.Type == reflect.TypeOf(values) {
+			value := fieldValue.Field(i).String()
 			values = fmt.Sprintf("%s'%s'", values, value)
 		} else {
+			value := fieldValue.Field(i).Int()
 			values = fmt.Sprintf("%s%d", values, value)
 		}
 
@@ -54,7 +55,7 @@ func composeInsert(db string, field interface{}) string {
 			columns = fmt.Sprintf("%s,", columns)
 			values = fmt.Sprintf("%s,", values)
 		}
-
 	}
+
 	return fmt.Sprintf("INSERT INTO `%s` (%s) VALUES (%s)", db, columns, values)
 }

@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS `member`(
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `userid` INT NOT NULL,
+    `id` INT NOT NULL,
     `name` VARCHAR(32) NOT NULL,
     `gender` CHAR(1) NOT NULL,
     `placeOfBirth` VARCHAR(16) NOT NULL,
@@ -9,16 +8,16 @@ CREATE TABLE IF NOT EXISTS `member`(
     `address2` VARCHAR(64) NOT NULL,
     `profession` VARCHAR(16) NOT NULL,
     `institution` VARCHAR(32) NOT NULL,
-    `identityNo` VARCHAR(32) NOT NULL,
     `phoneNo` VARCHAR(16) NOT NULL,
     `isWhatsapp` BOOLEAN NOT NULL DEFAULT FALSE,
-    `identityfile` VARCHAR(16) NOT NULL,
+    `identityNo` VARCHAR(32) NOT NULL,
     `identityType` CHAR(1) NOT NULL,
+    `identityFile` VARCHAR(16) NOT NULL,
     `photoFile` VARCHAR(16) NOT NULL,
     `agreementFile` VARCHAR(16) NOT NULL,
     `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `verifiedAt` TIMESTAMP,
     `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(`id`),
-    FOREIGN KEY(`userId`) REFERENCES user(`id`)
+    FOREIGN KEY(`id`) REFERENCES user(`id`)
 );

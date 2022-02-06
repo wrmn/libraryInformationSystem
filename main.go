@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/schollz/progressbar/v3"
 )
 
 func init() {
@@ -82,15 +83,16 @@ func databaseAction() {
 
 			infoPrint(2, task)
 		} else if *allCommand {
-			mainTask := "Running query create for all table"
-			infoPrint(1, mainTask)
+			task = "Running query create for all table"
+			infoPrint(1, task)
 
 			files, err := ioutil.ReadDir("query/create")
 			if err != nil {
 				errFatal(err, "")
 			}
 
-			var queryQueue, taskQueue []string
+			var queryQueue []string
+			bar := progressbar.Default(int64(len(files)))
 
 			for _, f := range files {
 				name := f.Name()
@@ -102,38 +104,31 @@ func databaseAction() {
 
 				table := reg.ReplaceAllString(name, "")
 
-				task = fmt.Sprintf("Creating table %s", table)
-				infoPrint(1, task)
-
 				content := readFile(fmt.Sprintf("query/create/%s.sql", table))
 
 				err = runQuery(db, content)
 				if err != nil {
-					// errFatal(err, "")
-					infoPrint(3, "Pending! "+task)
 					queryQueue = append(queryQueue, content)
-					taskQueue = append(taskQueue, task)
 					continue
 				}
-				infoPrint(2, task)
+				bar.Add(1)
 			}
 
-			for t, p := range queryQueue {
-				infoPrint(3, "Running pending task : "+taskQueue[t])
-
+			for _, p := range queryQueue {
 				err = runQuery(db, p)
 				if err != nil {
+					infoPrint(2, fmt.Sprintf("Error while executing : %s", p))
 					errFatal(err, "")
 					break
 				}
-				infoPrint(2, taskQueue[t])
+				bar.Add(1)
 			}
 
-			infoPrint(2, mainTask)
+			infoPrint(2, task)
 		}
-	case "populate":
+	case "seed":
 		if *tableName != "" {
-			task = fmt.Sprintf("fill data table %s", *tableName)
+			task = fmt.Sprintf("Fill data table %s", *tableName)
 			populate := fmt.Sprint(strings.Title(*tableName)) + "Seeder"
 
 			infoPrint(1, task)
@@ -144,6 +139,8 @@ func databaseAction() {
 			}
 			meth := reflect.ValueOf(param).MethodByName(populate)
 			meth.Call(nil)
+
+			infoPrint(2, task)
 		}
 
 	default:

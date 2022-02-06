@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS `inventories`(
     `registrationId` INT NOT NULL,
     `serialNumber` INT NOT NULL,
     `name` VARCHAR(32) NOT NULL,
-    `category` INT NOT NULL,
-    `status` INT NOT NULL,
+    `category` CHAR(1) NOT NULL,
+    `status` CHAR(1) NOT NULL,
     `description` VARCHAR(256) NOT NULL,
     PRIMARY KEY(`id`),
     FOREIGN KEY(`registrationId`) REFERENCES assetRecord(`id`)
