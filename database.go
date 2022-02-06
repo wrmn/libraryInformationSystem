@@ -46,7 +46,10 @@ func composeInsert(db string, field interface{}) string {
 		if column.Type == reflect.TypeOf(values) {
 			value := fieldValue.Field(i).String()
 			values = fmt.Sprintf("%s'%s'", values, value)
-		} else {
+		} else if column.Type == reflect.TypeOf(true) {
+			value := fieldValue.Field(i).Bool()
+			values = fmt.Sprintf("%s%t", values, value)
+		} else if column.Type == reflect.TypeOf(1) {
 			value := fieldValue.Field(i).Int()
 			values = fmt.Sprintf("%s%d", values, value)
 		}
@@ -58,4 +61,20 @@ func composeInsert(db string, field interface{}) string {
 	}
 
 	return fmt.Sprintf("INSERT INTO `%s` (%s) VALUES (%s)", db, columns, values)
+}
+
+func selectCount(i QueryParam, s SearchParam) (result int) {
+	var query string
+	if reflect.TypeOf(s.Value) == reflect.TypeOf("") {
+		query = fmt.Sprintf("SELECT count(*) FROM %s WHERE %s='%v'", i.TableName, s.Column, s.Value)
+	} else if reflect.TypeOf(s.Value) == reflect.TypeOf(1) {
+		query = fmt.Sprintf("SELECT count(*) FROM %s WHERE %s=%v", i.TableName, s.Column, s.Value)
+	} else if reflect.TypeOf(s.Value) == reflect.TypeOf(true) {
+		query = fmt.Sprintf("SELECT count(*) FROM %s WHERE %s=%v", i.TableName, s.Column, s.Value)
+	}
+	if err := i.Db.QueryRow(query).Scan(&result); err != nil {
+		fmt.Println("error")
+	}
+
+	return result
 }

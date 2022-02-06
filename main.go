@@ -133,7 +133,7 @@ func databaseAction() {
 
 			infoPrint(1, task)
 
-			param := InsertParam{
+			param := QueryParam{
 				Db:        db,
 				TableName: *tableName,
 			}

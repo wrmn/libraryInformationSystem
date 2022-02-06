@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 )
 
 // check if file exist
@@ -58,4 +59,17 @@ func readFile(fileName string) string {
 		errFatal(err, "")
 	}
 	return string(content)
+}
+
+// Format int to ddc format
+func intToDdc(c int) string {
+	var num string
+	if c < 10 {
+		num = fmt.Sprintf("00%d", c)
+	} else if c < 100 {
+		num = fmt.Sprintf("0%d", c)
+	} else {
+		num = strconv.Itoa(c)
+	}
+	return num
 }

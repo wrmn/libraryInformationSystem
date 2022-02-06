@@ -12,14 +12,28 @@ var (
 	task       string
 )
 
-type InsertParam struct {
+type QueryParam struct {
 	Db        *sql.DB
 	TableName string
 }
 
-type AssetRecording struct {
+type SearchParam struct {
+	Column string
+	Value  interface{}
+}
+
+type DbConfig struct {
+	Connection string `json:"connection"`
+	Host       string `json:"host"`
+	Port       string `json:"port"`
+	Username   string `json:"username"`
+	Password   string `json:"-"`
+	Database   string `json:"database"`
+}
+
+type AssetRecord struct {
 	Id                 int
-	AdminId            string
+	AdminId            int
 	RegistrationNumber string
 	RegistrationDate   string
 	Source             string
@@ -35,7 +49,7 @@ type Book struct {
 	Title          string
 	Author         string
 	Publisher      string
-	Availability   string
+	Availability   bool
 	Price          int
 	CreatedAt      string
 	UpdatedAt      string
@@ -118,13 +132,4 @@ type Visitor struct {
 	LoginAt string
 	Method  string
 	Purpose string
-}
-
-type DbConfig struct {
-	Connection string `json:"connection"`
-	Host       string `json:"host"`
-	Port       string `json:"port"`
-	Username   string `json:"username"`
-	Password   string `json:"-"`
-	Database   string `json:"database"`
 }

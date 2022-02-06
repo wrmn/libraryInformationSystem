@@ -48,7 +48,7 @@ Action
 ```
 
 ## Table Name
-- assetRecording
+- assetRecord
 - books
 - borrows
 - ddc
