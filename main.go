@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"reflect"
 	"regexp"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -22,7 +24,7 @@ func init() {
 	infoPrint(3, ".env file read successfully")
 
 	dbAction = flag.String("d", "", "database command.")
-	sysAction = flag.String("r", "", "run action system")
+	// sysAction = flag.String("r", "", "run action system")
 	tableName = flag.String("t", "", "create table")
 	allCommand = flag.Bool("a", false, "run all query file")
 
@@ -41,18 +43,20 @@ func main() {
 	}
 }
 
+// run action for database
 func databaseAction() {
+	db, err := initDb()
+	if err != nil {
+		errFatal(err, "check database connection! Run test!")
+		return
+	}
+
+	defer db.Close()
+
 	switch *dbAction {
 	case "test":
 		task = "Testing database connection"
 		infoPrint(1, task)
-		db, err := initDb()
-		if err != nil {
-			errFatal(err, "check .env file")
-			break
-		}
-
-		defer db.Close()
 
 		err = pingDB(db)
 		if err != nil {
@@ -64,13 +68,6 @@ func databaseAction() {
 		infoPrint(3, "Database connected")
 
 	case "create":
-		db, err := initDb()
-		if err != nil {
-			errFatal(err, "check database connection! Run test!")
-			break
-		}
-		defer db.Close()
-
 		if *tableName != "" {
 			task = fmt.Sprintf("Creating table %s", *tableName)
 			infoPrint(1, task)
@@ -93,6 +90,8 @@ func databaseAction() {
 				errFatal(err, "")
 			}
 
+			var queryQueue, taskQueue []string
+
 			for _, f := range files {
 				name := f.Name()
 
@@ -110,12 +109,41 @@ func databaseAction() {
 
 				err = runQuery(db, content)
 				if err != nil {
-					errFatal(err, "")
-					break
+					// errFatal(err, "")
+					infoPrint(3, "Pending! "+task)
+					queryQueue = append(queryQueue, content)
+					taskQueue = append(taskQueue, task)
+					continue
 				}
 				infoPrint(2, task)
 			}
+
+			for t, p := range queryQueue {
+				infoPrint(3, "Running pending task : "+taskQueue[t])
+
+				err = runQuery(db, p)
+				if err != nil {
+					errFatal(err, "")
+					break
+				}
+				infoPrint(2, taskQueue[t])
+			}
+
 			infoPrint(2, mainTask)
+		}
+	case "populate":
+		if *tableName != "" {
+			task = fmt.Sprintf("fill data table %s", *tableName)
+			populate := fmt.Sprint(strings.Title(*tableName)) + "Seeder"
+
+			infoPrint(1, task)
+
+			param := InsertParam{
+				Db:        db,
+				TableName: *tableName,
+			}
+			meth := reflect.ValueOf(param).MethodByName(populate)
+			meth.Call(nil)
 		}
 
 	default:
