@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `member`(
     `id` INT NOT NULL,
     `name` VARCHAR(32) NOT NULL,
     `gender` CHAR(1) NOT NULL,
-    `placeOfBirth` VARCHAR(16) NOT NULL,
+    `placeOfBirth` VARCHAR(32) NOT NULL,
     `dateOfBirth` DATE NOT NULL,
     `address1` VARCHAR(64) NOT NULL,
     `address2` VARCHAR(64) NOT NULL,

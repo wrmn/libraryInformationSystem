@@ -60,8 +60,8 @@ func composeInsert(db string, field interface{}) string {
 		}
 
 		if i != fieldType.NumField()-1 {
-			columns = fmt.Sprintf("%s,", columns)
-			values = fmt.Sprintf("%s,", values)
+			columns = fmt.Sprintf("%s, ", columns)
+			values = fmt.Sprintf("%s, ", values)
 		}
 	}
 

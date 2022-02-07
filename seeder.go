@@ -28,7 +28,7 @@ func (i QueryParam) AssetRecordSeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, query)
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}
@@ -62,7 +62,7 @@ func (i QueryParam) BookSeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, "")
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}
@@ -85,7 +85,7 @@ func (i QueryParam) BorrowSeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, "")
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}
@@ -116,7 +116,7 @@ func (i QueryParam) DdcSeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, "")
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}
@@ -128,19 +128,21 @@ func (i QueryParam) EmployeeSeeder() {
 	rand.Seed(time.Now().UnixNano())
 
 	for c := 0; c < 6; c++ {
+		birthDate := dateRandom("1960-01-01", "2000-01-01")
+		address := gofakeit.Address()
+
 		genderIndex := rand.Intn(2)
 		data.Id = c + 1
-		data.EmployeeNumber = fmt.Sprintf("%s%s%d%d%d%d",
-			dateRandom("1960-01-01", "2000-01-01").Format("20060102"),
+		data.EmployeeNumber = fmt.Sprintf("%s%s%d%s",
+			birthDate.Format("20060102"),
 			dateRandom("1980-01-01", time.Now().Format(dmy)).Format("200601"),
 			genderIndex,
-			rand.Intn(9),
-			rand.Intn(9),
-			rand.Intn(9),
+			randDigit(3),
 		)
 		data.Name = gofakeit.Name()
 		data.Gender = gender[genderIndex]
-		address := gofakeit.Address()
+		data.PlaceOfBirth = gofakeit.Address().City
+		data.DateOfBirth = birthDate.Format(dmy)
 		data.Address1 = address.Street
 		data.Address2 = fmt.Sprintf("%s, %s",
 			address.City,
@@ -151,7 +153,7 @@ func (i QueryParam) EmployeeSeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, "")
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}
@@ -173,7 +175,7 @@ func (i QueryParam) GuestSeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, "")
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}
@@ -199,14 +201,65 @@ func (i QueryParam) InventorySeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, query)
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}
 
 }
 
-func (i QueryParam) MemberSeeder() {}
+func (i QueryParam) MemberSeeder() {
+	data := Member{}
+	bar := progressbar.Default(44)
+	t := time.Now().Format(dmyhms)
+	rand.Seed(time.Now().UnixNano())
+	for c := 0; c < 44; c++ {
+		birthDate := dateRandom("1900-01-01", "2016-01-01")
+		address := gofakeit.Address()
+
+		data.Id = c + 7
+		data.Name = gofakeit.Name()
+		data.Gender = gender[rand.Intn(2)]
+		data.PlaceOfBirth = gofakeit.Address().City
+		data.DateOfBirth = birthDate.Format(dmy)
+		data.Address1 = address.Street
+		data.Address2 = fmt.Sprintf("%s, %s",
+			address.City,
+			address.Country,
+		)
+		data.Profession = strconv.Itoa(rand.Intn(8) + 1)
+		data.Institution = gofakeit.Company()
+		data.PhoneNo = gofakeit.Phone()
+		data.IsWhatsapp = (rand.Intn(4)%2 == 0)
+		data.IdentityType = strconv.Itoa(rand.Intn(4) + 1)
+		if data.IdentityType == "3" {
+			data.IdentityNo = randDigit(12)
+		} else if data.IdentityType == "4" {
+			data.IdentityNo = fmt.Sprintf("%s/%s/%s",
+				randDigit(5),
+				strings.ToUpper(gofakeit.LetterN(2)),
+				birthDate.Format("2006"),
+			)
+		} else {
+			data.IdentityNo = fmt.Sprintf("%s%s%s",
+				randDigit(6),
+				birthDate.Format("02012006"),
+				randDigit(4),
+			)
+		}
+		data.IdentityFile = "default.jpg"
+		data.PhotoFile = "default.jpg"
+		data.AgreementFile = "default.pdf"
+		data.CreatedAt, data.VerifiedAt, data.UpdatedAt = t, t, t
+		query := composeInsert(i.TableName, data)
+		err := runQuery(i.Db, query)
+		if err != nil {
+			errFatal(err, "Error while executing : "+query)
+		}
+		bar.Add(1)
+	}
+
+}
 
 //make query for insert data user
 func (i QueryParam) UserSeeder() {
@@ -221,7 +274,7 @@ func (i QueryParam) UserSeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, query)
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}
@@ -247,7 +300,7 @@ func (i QueryParam) VisitorSeeder() {
 		query := composeInsert(i.TableName, data)
 		err := runQuery(i.Db, query)
 		if err != nil {
-			errFatal(err, query)
+			errFatal(err, "Error while executing : "+query)
 		}
 		bar.Add(1)
 	}

@@ -141,6 +141,34 @@ func databaseAction() {
 			meth.Call(nil)
 
 			infoPrint(2, task)
+		} else if *allCommand {
+			tableName := []string{
+				"ddc",
+				"guest",
+				"user",
+				"assetRecord",
+				"book",
+				"borrow",
+				"employee",
+				"inventory",
+				"member",
+				"visitor",
+			}
+			for _, p := range tableName {
+				task = fmt.Sprintf("Fill data table %s", p)
+				populate := fmt.Sprint(strings.Title(p)) + "Seeder"
+
+				infoPrint(1, task)
+
+				param := QueryParam{
+					Db:        db,
+					TableName: p,
+				}
+				meth := reflect.ValueOf(param).MethodByName(populate)
+				meth.Call(nil)
+
+				infoPrint(2, task)
+			}
 		}
 
 	default:

@@ -77,6 +77,8 @@ type Employee struct {
 	EmployeeNumber string
 	Name           string
 	Gender         string
+	PlaceOfBirth   string
+	DateOfBirth    string
 	Address1       string
 	Address2       string
 	Division       string
@@ -107,7 +109,7 @@ type Member struct {
 	DateOfBirth   string
 	Address1      string
 	Address2      string
-	Proffession   string
+	Profession    string
 	Institution   string
 	PhoneNo       string
 	IsWhatsapp    bool

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -82,4 +83,17 @@ func intToDdc(c int) string {
 		num = strconv.Itoa(c)
 	}
 	return num
+}
+
+func randDigit(i int) (s string) {
+	var d int
+	for c := 0; c < i; c++ {
+		if c == 0 {
+			d = rand.Intn(8) + 1
+		} else {
+			d = rand.Intn(9)
+		}
+		s = fmt.Sprintf("%s%d", s, d)
+	}
+	return s
 }
