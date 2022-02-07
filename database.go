@@ -34,6 +34,7 @@ func runQuery(db *sql.DB, content string) error {
 	return nil
 }
 
+// make query string for insert
 func composeInsert(db string, field interface{}) string {
 	fieldType := reflect.TypeOf(field)
 	fieldValue := reflect.ValueOf(field)
@@ -45,13 +46,17 @@ func composeInsert(db string, field interface{}) string {
 		columns = fmt.Sprintf("%s`%s`", columns, strings.ToLower(column.Name))
 		if column.Type == reflect.TypeOf(values) {
 			value := fieldValue.Field(i).String()
-			values = fmt.Sprintf("%s'%s'", values, value)
+			values = fmt.Sprintf("%s\"%s\"", values, value)
 		} else if column.Type == reflect.TypeOf(true) {
 			value := fieldValue.Field(i).Bool()
 			values = fmt.Sprintf("%s%t", values, value)
 		} else if column.Type == reflect.TypeOf(1) {
 			value := fieldValue.Field(i).Int()
-			values = fmt.Sprintf("%s%d", values, value)
+			if value != 0 {
+				values = fmt.Sprintf("%s%d", values, value)
+			} else {
+				values = fmt.Sprintf("%sNULL", values)
+			}
 		}
 
 		if i != fieldType.NumField()-1 {
@@ -61,6 +66,18 @@ func composeInsert(db string, field interface{}) string {
 	}
 
 	return fmt.Sprintf("INSERT INTO `%s` (%s) VALUES (%s)", db, columns, values)
+}
+
+// count total book and inventory that have same registration id
+func totalSerial(i *sql.DB, s SearchParam) int {
+	param := QueryParam{
+		Db: i,
+	}
+	paramBook, paramInventory := param, param
+	paramBook.TableName, paramInventory.TableName = "book", "inventory"
+	bookCount := selectCount(paramBook, s)
+	inventCount := selectCount(paramInventory, s)
+	return bookCount + inventCount
 }
 
 func selectCount(i QueryParam, s SearchParam) (result int) {
@@ -73,7 +90,7 @@ func selectCount(i QueryParam, s SearchParam) (result int) {
 		query = fmt.Sprintf("SELECT count(*) FROM %s WHERE %s=%v", i.TableName, s.Column, s.Value)
 	}
 	if err := i.Db.QueryRow(query).Scan(&result); err != nil {
-		fmt.Println("error")
+		fmt.Println(err.Error())
 	}
 
 	return result

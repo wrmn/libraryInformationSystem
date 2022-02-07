@@ -7,12 +7,10 @@ require (
 	github.com/joho/godotenv v1.4.0
 )
 
-require (
-	github.com/bxcodec/faker/v3 v3.7.0
-	github.com/schollz/progressbar/v3 v3.8.6
-)
+require github.com/schollz/progressbar/v3 v3.8.6
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.14.5
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect

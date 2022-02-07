@@ -7,12 +7,22 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
+
+	"github.com/brianvoe/gofakeit/v6"
 )
 
 // check if file exist
 func isFileExist(path string) bool {
 	_, err := os.Stat(path)
 	return !errors.Is(err, os.ErrNotExist)
+}
+
+// date random in time.Time with param string formatted date. format param : yyyy-mm-dd
+func dateRandom(minYear string, maxYear string) time.Time {
+	min, _ := time.Parse(dmy, minYear)
+	max, _ := time.Parse(dmy, maxYear)
+	return gofakeit.DateRange(min, max)
 }
 
 // Create file

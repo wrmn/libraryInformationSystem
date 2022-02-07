@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `inventories`(
+CREATE TABLE IF NOT EXISTS `inventory`(
     `id` INT NOT NULL AUTO_INCREMENT,
     `registrationId` INT NOT NULL,
     `serialNumber` INT NOT NULL,

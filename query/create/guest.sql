@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `guest`(
     `name` VARCHAR(32) NOT NULL,
     `gender` CHAR(1) NOT NULL,
     `address` VARCHAR(64) NOT NULL,
-    `profession` VARCHAR(16) NOT NULL,
-    `institution` VARCHAR(32) NOT NULL,
+    `profession` CHAR(1) NOT NULL,
+    `institution` VARCHAR(64) NOT NULL,
     PRIMARY KEY(`id`)
 );
