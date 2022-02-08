@@ -48,6 +48,7 @@ Action
 ```
 
 ## Table Name
+
 - assetRecord
 - books
 - borrows
@@ -60,8 +61,11 @@ Action
 - visitors
 
 ## ERD
-![Erd](https://imgur.com/KkmL4JP.png)
+
+![Erd](https://imgur.com/g1XyOPp.png)
+
 ## TODO
+
 - Create table on database base on user input/file
 - Read data from database
 - RestAPI Handler
