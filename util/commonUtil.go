@@ -1,10 +1,9 @@
-package config
+package util
 
 import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"librarySysfo/models"
 	"log"
 	"math/rand"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/fatih/color"
 )
 
 // FILE
@@ -56,15 +56,15 @@ func InfoPrint(status int, msg string) {
 	var info string
 	switch status {
 	case 1:
-		info = "TASK"
+		info = color.GreenString("STARTING  ")
 	case 2:
-		info = "DONE"
+		info = color.GreenString("SUCCESS   ")
 	case 3:
-		info = "INFO"
+		info = "INFO      "
 	case 4:
-		info = "WARNING"
+		info = color.YellowString("WARNING   ")
 	case 5:
-		info = "ERROR"
+		info = color.RedString("ERROR     ")
 	}
 	log.Printf("%s : %s\n", info, msg)
 	fmt.Printf("%s : %s\n", info, msg)
@@ -74,7 +74,7 @@ func InfoPrint(status int, msg string) {
 // ===========
 
 // make response for http request
-func ResponseFormatter(r models.Response) {
+func ResponseFormatter(r response) {
 	r.Writer.Header().Set("Content-Type", "application/json")
 	r.Writer.WriteHeader(r.Code)
 	r.Writer.Write(r.Data)
@@ -97,16 +97,16 @@ func IntToDdc(c int) string {
 // =====================
 
 // make response param for wrong application type
-func BadType(w http.ResponseWriter) models.Response {
-	return models.Response{
+func BadType(w http.ResponseWriter) response {
+	return response{
 		Writer: w,
 		Data:   []byte("Content Type is not application/json"),
 		Code:   http.StatusUnsupportedMediaType,
 	}
 }
 
-func BadRequest(w http.ResponseWriter, msg string) models.Response {
-	return models.Response{
+func BadRequest(w http.ResponseWriter, msg string) response {
+	return response{
 		Writer: w,
 		Data:   []byte(msg),
 		Code:   http.StatusBadRequest,
@@ -132,7 +132,7 @@ func RandDigit(n int) (s string) {
 
 // date random in time.Time with param string formatted date. format param : yyyy-mm-dd
 func DateRandom(minYear string, maxYear string) time.Time {
-	min, _ := time.Parse(models.Dmy, minYear)
-	max, _ := time.Parse(models.Dmy, maxYear)
+	min, _ := time.Parse(Dmy, minYear)
+	max, _ := time.Parse(Dmy, maxYear)
 	return gofakeit.DateRange(min, max)
 }

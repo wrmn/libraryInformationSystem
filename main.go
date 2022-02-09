@@ -5,27 +5,27 @@ import (
 	"log"
 
 	"librarySysfo/command"
-	"librarySysfo/config"
 	"librarySysfo/database"
+	"librarySysfo/util"
 )
 
 func init() {
 	logFile := "log.txt"
 
-	err := config.EnvReader()
+	err := util.EnvReader()
 	if err != nil {
-		config.ErrFatal(err, "")
+		util.ErrFatal(err, "")
 	}
 
-	config.LogInit(logFile)
-	config.InfoPrint(3, ".env file read successfully")
+	util.LogInit(logFile)
+	util.InfoPrint(3, ".env file read successfully")
 
-	command.ActionName = flag.String("r", "", "Action name")
-	command.TableName = flag.String("t", "", "Table name")
-	command.AllCommand = flag.Bool("a", false, "All")
+	util.ActionName = flag.String("r", "", "Action name")
+	util.TableName = flag.String("t", "", "Table name")
+	util.AllCommand = flag.Bool("a", false, "All")
 	err = database.InitDatabase()
 	if err != nil {
-		config.ErrFatal(err, "")
+		util.ErrFatal(err, "")
 	}
 
 	flag.Parse()

@@ -1,7 +1,7 @@
 package database
 
 import (
-	"librarySysfo/config"
+	"librarySysfo/util"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -10,7 +10,7 @@ import (
 var DB *gorm.DB
 
 func InitDatabase() (err error) {
-	source, dbConfig := config.GetDbSource()
+	source, dbConfig := util.GetDbSource()
 
 	if source == "mysql" {
 		DB, err = gorm.Open(mysql.Open(dbConfig), &gorm.Config{})

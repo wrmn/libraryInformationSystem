@@ -2,7 +2,7 @@ package migrations
 
 import (
 	"librarySysfo/database"
-	"librarySysfo/models"
+	"librarySysfo/database/models"
 )
 
 func borrowMigration() {

@@ -1,9 +1,8 @@
-package config
+package util
 
 import (
 	"encoding/json"
 	"fmt"
-	"librarySysfo/models"
 	"log"
 	"os"
 
@@ -58,7 +57,7 @@ func GetDbSource() (string, string) {
 }
 
 // Get database variable
-func getDbConfig() (config models.DbConfig) {
+func getDbConfig() (config dbConfig) {
 	config.Connection = os.Getenv(("DB_CONNECTION"))
 	config.Host = os.Getenv("DB_HOST")
 	config.Port = os.Getenv("DB_PORT")
