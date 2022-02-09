@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 
 	"librarySysfo/command"
 	"librarySysfo/database"
@@ -32,6 +31,6 @@ func init() {
 }
 
 func main() {
-	log.Println("Starting Program")
+	util.InfoPrint(3, "Starting Program")
 	command.ReadCommand()
 }

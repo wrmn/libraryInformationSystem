@@ -6,6 +6,7 @@ import (
 	"librarySysfo/util"
 )
 
+// Read command flag from running program
 func ReadCommand() {
 	switch *util.ActionName {
 	case "migrate":
@@ -16,7 +17,7 @@ func ReadCommand() {
 		}
 	case "seed":
 		if *util.TableName != "" {
-			// seeds.MigrateTable(*util.TableName)
+			// seeds.SeedTable(*util.TableName)
 		} else {
 			seeds.SeedAll()
 		}

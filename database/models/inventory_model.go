@@ -10,6 +10,6 @@ type Inventory struct {
 	Name           string      `json:"name" gorm:"type:varchar(32);not null"`
 	Category       int         `json:"category" gorm:"type:int;size:32;not null"`
 	Status         int         `json:"status" gorm:"type:int;size:32;not null"`
-	Description    string      `json:"description" gorm:"type:int;size:256;not null"`
+	Description    string      `json:"description" gorm:"type:varchar(256);not null"`
 	AssetRecord    AssetRecord `gorm:"foreignkey:RegistrationId"`
 }

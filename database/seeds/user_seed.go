@@ -16,14 +16,15 @@ func userSeed() {
 	data := []models.User{}
 	task := "Seeding Table User"
 	util.InfoPrint(1, task)
-	rand.Seed(time.Now().UnixNano())
+	now := time.Now()
+	rand.Seed(now.UnixNano())
 	for c := 0; c < 50; c++ {
 		data = append(data, models.User{
 			Id:        c + 1,
 			Username:  gofakeit.Gamertag(),
 			Email:     gofakeit.Email(),
 			Password:  fmt.Sprintf("%x", md5.Sum([]byte("12312312"))),
-			LastLogin: time.Now(),
+			LastLogin: &now,
 		})
 	}
 

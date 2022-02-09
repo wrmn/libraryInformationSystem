@@ -12,7 +12,8 @@ import (
 // initialize log file
 func LogInit(file string) {
 	if !isFileExist(file) {
-		err := createFile(file)
+		myfile, err := os.Create(file)
+		myfile.Close()
 		if err != nil {
 			ErrFatal(err, "")
 		}
@@ -25,7 +26,7 @@ func LogInit(file string) {
 
 	log.SetOutput(f)
 
-	log.Println("Initializing program")
+	InfoPrint(3, "Initializing program")
 	InfoPrint(3, "Log file configured")
 }
 

@@ -1,7 +1,11 @@
 package migrations
 
-import "fmt"
+import (
+	"fmt"
+	"librarySysfo/util"
+)
 
+// Run all migration
 func MigrateAll() {
 	ddcMigration()
 	guestMigration()
@@ -18,6 +22,7 @@ func MigrateAll() {
 
 }
 
+// Run Specific Migration
 func MigrateTable(table string) {
 	switch table {
 	case "assetRecord":
@@ -41,6 +46,7 @@ func MigrateTable(table string) {
 	case "visitor":
 		visitorMigration()
 	default:
-		fmt.Printf("Table not found :  %s", table)
+		info := fmt.Sprintf("No migration for table : %s", table)
+		util.InfoPrint(5, info)
 	}
 }

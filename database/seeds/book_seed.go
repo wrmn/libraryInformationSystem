@@ -11,7 +11,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 )
 
-func bookSeeder() {
+func bookSeed() {
 	var regSerial, ddcSerial, invSerial int64
 
 	task := "Seeding Table Book"

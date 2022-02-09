@@ -8,8 +8,7 @@ var (
 	ActionName *string
 	TableName  *string
 	AllCommand *bool
-	Dmy        string = "2006-01-02 "
-	Dmyhms     string = "2006-01-02 15:04:05"
+	Dmy        string = "2006-01-02"
 	Gender            = []string{"M", "F"}
 )
 

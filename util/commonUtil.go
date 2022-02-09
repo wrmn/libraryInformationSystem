@@ -1,84 +1,13 @@
 package util
 
 import (
-	"errors"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"math/rand"
-	"net/http"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/fatih/color"
 )
-
-// FILE
-// ===========
-
-// check if file exist
-func isFileExist(path string) bool {
-	_, err := os.Stat(path)
-	return !errors.Is(err, os.ErrNotExist)
-}
-
-// Create file
-func createFile(file string) error {
-	myfile, err := os.Create(file)
-	myfile.Close()
-	return err
-}
-
-// Read string from file
-func ReadFile(fileName string) string {
-	content, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		fmt.Println(err)
-		ErrFatal(err, "")
-	}
-	return string(content)
-}
-
-// Print Error information
-func ErrFatal(err error, msg string) {
-	fmt.Println("ERROR : runnig task! Check log file for more info")
-	if msg != "" {
-		fmt.Printf("System says : %s\n", msg)
-	}
-	log.Fatalf("Some error occured. Err : %s", err)
-}
-
-// Print task on terminal and log
-// 1=TASK;2=DONE;3=INFO;4=WARNING;5=ERROR;
-func InfoPrint(status int, msg string) {
-	var info string
-	switch status {
-	case 1:
-		info = color.GreenString("STARTING  ")
-	case 2:
-		info = color.GreenString("SUCCESS   ")
-	case 3:
-		info = "INFO      "
-	case 4:
-		info = color.YellowString("WARNING   ")
-	case 5:
-		info = color.RedString("ERROR     ")
-	}
-	log.Printf("%s : %s\n", info, msg)
-	fmt.Printf("%s : %s\n", info, msg)
-}
-
-// DATA FORMATTER
-// ===========
-
-// make response for http request
-func ResponseFormatter(r response) {
-	r.Writer.Header().Set("Content-Type", "application/json")
-	r.Writer.WriteHeader(r.Code)
-	r.Writer.Write(r.Data)
-}
 
 // Format int to ddc format
 func IntToDdc(c int) string {
@@ -92,29 +21,6 @@ func IntToDdc(c int) string {
 	}
 	return num
 }
-
-// BAD REQUEST FORMATTER
-// =====================
-
-// make response param for wrong application type
-func BadType(w http.ResponseWriter) response {
-	return response{
-		Writer: w,
-		Data:   []byte("Content Type is not application/json"),
-		Code:   http.StatusUnsupportedMediaType,
-	}
-}
-
-func BadRequest(w http.ResponseWriter, msg string) response {
-	return response{
-		Writer: w,
-		Data:   []byte(msg),
-		Code:   http.StatusBadRequest,
-	}
-}
-
-// RANDOM GENERATOR
-// ================
 
 // give string of random digit with n lenght
 func RandDigit(n int) (s string) {

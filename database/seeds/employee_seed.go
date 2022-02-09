@@ -11,7 +11,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 )
 
-func employeeSeeder() {
+func employeeSeed() {
 	data := []models.Employee{}
 	task := "Seeding Table Employee"
 	util.InfoPrint(1, task)
@@ -20,6 +20,10 @@ func employeeSeeder() {
 		birthDate := util.DateRandom("1960-01-01", "200-01-01")
 		genderIndex := rand.Intn(2)
 		address := gofakeit.Address()
+		address2 := fmt.Sprintf("%s, %s",
+			address.City,
+			address.Country,
+		)
 
 		data = append(data, models.Employee{
 			Id: c + 1,
@@ -35,12 +39,9 @@ func employeeSeeder() {
 			DateOfBirth:  birthDate,
 			PlaceOfBirth: gofakeit.City(),
 			Address1:     address.Street,
-			Address2: fmt.Sprintf("%s, %s",
-				address.City,
-				address.Country,
-			),
-			Division: rand.Intn(5) + 1,
-			Position: gofakeit.JobTitle(),
+			Address2:     &address2,
+			Division:     rand.Intn(5) + 1,
+			Position:     gofakeit.JobTitle(),
 		})
 	}
 
