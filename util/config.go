@@ -39,7 +39,7 @@ func EnvReader() error {
 // Get database connection string
 func GetDbSource() (string, string) {
 	c := getDbConfig()
-	source := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+	source := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		c.Username,
 		c.Password,
 		c.Host,

@@ -1,8 +1,10 @@
 package command
 
 import (
+	"fmt"
 	"librarySysfo/database/migrations"
 	"librarySysfo/database/seeds"
+	"librarySysfo/server"
 	"librarySysfo/util"
 )
 
@@ -17,9 +19,14 @@ func ReadCommand() {
 		}
 	case "seed":
 		if *util.TableName != "" {
-			// seeds.SeedTable(*util.TableName)
+			seeds.SeedTable(*util.TableName)
 		} else {
 			seeds.SeedAll()
 		}
+	case "serve":
+		server.Serve()
+	default:
+		info := fmt.Sprintf("Command %s not available", *util.ActionName)
+		util.InfoPrint(5, info)
 	}
 }

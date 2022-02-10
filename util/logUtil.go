@@ -22,20 +22,20 @@ func InfoPrint(status int, msg string) {
 	var info, logInfo string
 	switch status {
 	case 1:
-		logInfo = "STARTING  "
+		logInfo = "Start   "
 		info = color.CyanString(logInfo)
 	case 2:
-		logInfo = "SUCCESS   "
+		logInfo = "Done    "
 		info = color.GreenString(logInfo)
 	case 3:
-		logInfo = "INFO      "
+		logInfo = "Info    "
 		info = color.BlueString(logInfo)
 	case 4:
-		logInfo = "WARNING   "
+		logInfo = "Warning "
 		info = color.YellowString(logInfo)
 	case 5:
-		logInfo = "ERROR     "
-		info = color.RedString("ERROR     ")
+		logInfo = "Error   "
+		info = color.RedString(logInfo)
 	}
 	log.Printf("%s : %s\n", logInfo, msg)
 	fmt.Printf("%s : %s\n", info, msg)
