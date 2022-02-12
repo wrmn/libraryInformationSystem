@@ -23,7 +23,7 @@ func ReadCommand() {
 		} else {
 			seeds.SeedAll()
 		}
-	case "serve":
+	case "serve", "":
 		server.Serve()
 	default:
 		info := fmt.Sprintf("Command %s not available", *util.ActionName)

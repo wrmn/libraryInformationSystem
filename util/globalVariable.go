@@ -9,6 +9,7 @@ var (
 	TableName  *string
 	AllCommand *bool
 	Dmy        string = "2006-01-02"
+	Dmyhms     string = "15:04:05.000"
 	Gender            = []string{"M", "F"}
 )
 

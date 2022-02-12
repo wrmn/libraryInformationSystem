@@ -11,81 +11,70 @@ import (
 )
 
 func login(w http.ResponseWriter, r *http.Request) {
-	util.InfoPrint(3, fmt.Sprintf("New Request %s", r.URL.Path))
-
+	util.InfoPrint(1, fmt.Sprintf("New Request %s", r.URL.Path))
 	var creds models.User
-	var some user
-	err := json.NewDecoder(r.Body).Decode(&creds)
+	var data user
+	var count int64
+
+	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		badRequest(w)
 		return
 	}
-	// userPassword, ok := userdb[creds.Username]
 
-	// // if user exist, verify the password
-	// if !ok || userPassword != creds.Password {
-	// 	unAuthorized(w)
-	// 	return
-	// }
-	database.DB.Where(&creds).First(&some)
-	fmt.Printf("%+v\n", some)
+	database.DB.
+		Find(&creds, "username = ? AND password = ?", data.Username, data.Password).
+		Count(&count)
 
-	// TODO: change auth from database
-	result := token{}
+	if count <= 0 {
+		util.InfoPrint(5, "user not found")
+		response := responseParam{
+			W:      w,
+			Body:   respToByte("error", "Record not found", http.StatusUnauthorized),
+			Status: http.StatusUnauthorized,
+		}
+		responseFormatter(response, " ")
+		return
+	}
+
+	util.InfoPrint(3, fmt.Sprintf("user Authorized, username %s", data.Username))
+	util.InfoPrint(1, "Creating token")
+
+	result := tokenCred{}
 	result.AccessToken, err = createToken(creds)
 	if err != nil {
 		log.Fatal(err)
 		util.InfoPrint(5, err.Error())
 		return
 	}
+
+	util.InfoPrint(2, "Creating token")
+	util.InfoPrint(1, "Creating refresh token")
+
 	result.RefreshToken, err = createRefreshToken(result)
 	if err != nil {
 		log.Fatal(err)
 		util.InfoPrint(5, err.Error())
 		return
 	}
+	util.InfoPrint(2, "Creating refresh token")
 
-	msg := respToByte("success", result, http.StatusAccepted)
 	response := responseParam{
 		W:      w,
-		Body:   msg,
+		Body:   respToByte("success", result, http.StatusAccepted),
 		Status: http.StatusAccepted,
 	}
-	responseFormatter(response)
-}
+	responseFormatter(response, "")
+	util.InfoPrint(2, fmt.Sprintf("New Request %s", r.URL.Path))
 
-func refresh(w http.ResponseWriter, r *http.Request) {
-	var creds token
-	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
-		badRequest(w)
-		return
-	}
-	user, err := validateRefreshToken(creds)
-	if err != nil {
-		json.NewEncoder(w).Encode("Invalid Token")
-		return
-	}
-
-	creds.AccessToken, err = createToken(user)
-	if err != nil {
-		json.NewEncoder(w).Encode("Unable to create access token")
-		return
-	}
-	msg := respToByte("Success", creds, http.StatusOK)
-	response := responseParam{
-		W:      w,
-		Body:   msg,
-		Status: http.StatusAccepted,
-	}
-	responseFormatter(response)
 }
 
 func dashboard(w http.ResponseWriter, r *http.Request) {
+	util.InfoPrint(3, fmt.Sprintf("New Request %s", r.URL.Path))
 	token, err := inspectToken(w, r)
-	if err != nil {
+	if err {
 		return
 	}
 	user := token.Claims.(*credential)
-	json.NewEncoder(w).Encode(fmt.Sprintf("%s Dashboard", user.Username))
+	json.NewEncoder(w).Encode(fmt.Sprintf("%x Dashboard", user))
 }

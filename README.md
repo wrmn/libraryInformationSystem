@@ -18,33 +18,51 @@ go get -u
 
 ## Running app
 
+without build
+
 ```
 go run . <flag> <option>
 ```
 
+building
+
+```
+go build librarySysfo
+```
+
+```
+./librarySysfo <flag> <option>
+```
+
 ## Command
 
-### Database (-d)
+### run (-r)
 
 Command for action on database
 Action
 
-- Create Specific table
+- Migrate
 
-```
- go run . -d create -t <table-name>
-```
-
-- Create all table available
-
-```
- go run . -d create -a
+```sh
+#migrate all
+$ go run . -r migrate
+#migrate specific table
+$ go run . -r migrate -t <table-name>
 ```
 
-- Seed Specific table
+- Seed
 
+```sh
+#seed all
+$ go run . -r seed
+#seed specific table
+$ go run . -r seed -t <table-name>
 ```
- go run . -d seed -t <table-name>
+
+- Serve
+
+```sh
+$ go run . -r serve
 ```
 
 ## Table Name
@@ -66,10 +84,7 @@ Action
 
 ## TODO
 
-- Create table on database base on user input/file
-- Read data from database
 - RestAPI Handler
-- JWT
 - CRUD
 
 ## License

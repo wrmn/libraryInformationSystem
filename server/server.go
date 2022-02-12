@@ -18,7 +18,8 @@ func Serve() {
 	port := fmt.Sprintf(":%s", os.Getenv(("SERVICE_PORT")))
 
 	r.HandleFunc("/auth/login", login).Methods("POST")
-	r.HandleFunc("/auth/refresh", refresh).Methods("POST")
+
+	r.HandleFunc("/book", allBook).Methods("GET")
 	r.HandleFunc("/me", dashboard).Methods("GET")
 	r.NotFoundHandler = notFoundHandler()
 	r.MethodNotAllowedHandler = notAllowedHandler()
@@ -27,8 +28,11 @@ func Serve() {
 	http.ListenAndServe(port, r)
 }
 
-func responseFormatter(r responseParam) {
+func responseFormatter(r responseParam, token string) {
 	r.W.Header().Set("Content-Type", "application/json")
+	if token != "" {
+		r.W.Header().Set("something", token)
+	}
 	r.W.WriteHeader(r.Status)
 	r.W.Write(r.Body)
 }

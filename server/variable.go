@@ -20,7 +20,7 @@ type credential struct {
 	jwt.RegisteredClaims
 }
 
-type token struct {
+type tokenCred struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 }
@@ -34,8 +34,23 @@ type user struct {
 	Id       int
 	Username string
 	Email    string
+	Password string
 	// LastLogin datatypes.Date
 	// CreatedAt datatypes.Date
 	// UpdatedAt datatypes.Date
 	// DeletedAt datatypes.Date
+}
+
+type book struct {
+	Id             int
+	RegistrationId int
+	SerialNumber   int
+	DdcNo          string
+	DdcOrder       int
+	Title          string
+	Author         string
+	Publisher      string
+	Availability   bool
+	Status         int
+	Price          int
 }
