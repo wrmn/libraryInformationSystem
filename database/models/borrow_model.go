@@ -8,9 +8,9 @@ type Borrow struct {
 	MemberId      int        `json:"memberId" gorm:"type:int;size:32;not null"`
 	BookId        int        `json:"bookId" gorm:"type:int;size:32;not null"`
 	FineStatus    bool       `json:"fineStatus" gorm:"not null"`
-	DateOfBorrow  time.Time  `json:"dateOfBorrow" gorm:"type:datetime;not null"`
-	DateOfReturn  *time.Time `json:"dateOfReturn" gorm:"type:datetime"`
-	DateOfPayment *time.Time `json:"dateOfPayment" gorm:"type:datetime"`
+	DateOfBorrow  time.Time  `json:"dateOfBorrow" gorm:"type:timestamp;not null"`
+	DateOfReturn  *time.Time `json:"dateOfReturn" gorm:"type:timestamp"`
+	DateOfPayment *time.Time `json:"dateOfPayment" gorm:"type:timestamp"`
 	Admin         User       `gorm:"foreignkey:AdminId"`
 	Member        User       `gorm:"foreignkey:MemberId"`
 	Book          Book       `gorm:"foreignkey:BookId"`

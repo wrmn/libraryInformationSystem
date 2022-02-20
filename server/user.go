@@ -1,6 +1,7 @@
 package server
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"librarySysfo/database"
@@ -8,13 +9,14 @@ import (
 	"librarySysfo/util"
 	"log"
 	"net/http"
+	"regexp"
+	"time"
 )
 
 func login(w http.ResponseWriter, r *http.Request) {
 	util.InfoPrint(1, fmt.Sprintf("New Request %s", r.URL.Path))
 	var creds models.User
-	var data user
-	var count int64
+	var data userIn
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -22,12 +24,15 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	hashPasswd := md5.Sum([]byte(data.Password))
+	passwd := fmt.Sprintf("%x", hashPasswd)
 	database.DB.
-		Find(&creds, "username = ? AND password = ?", data.Username, data.Password).
-		Count(&count)
+		Where("username = ? AND password = ?", data.Username, passwd).
+		Find(&creds)
+	database.DB.Where("id = ?", creds.Id).Find(&creds.Employee)
 
-	if count <= 0 {
-		util.InfoPrint(5, "user not found")
+	if data.Username != creds.Username {
+		util.InfoPrint(5, fmt.Sprintf("user %s not found", data.Username))
 		response := responseParam{
 			W:      w,
 			Body:   respToByte("error", "Record not found", http.StatusUnauthorized),
@@ -37,7 +42,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	util.InfoPrint(3, fmt.Sprintf("user Authorized, username %s", data.Username))
+	util.InfoPrint(3, fmt.Sprintf("User Authorized, username %s", data.Username))
 	util.InfoPrint(1, "Creating token")
 
 	result := tokenCred{}
@@ -75,6 +80,82 @@ func dashboard(w http.ResponseWriter, r *http.Request) {
 	if err {
 		return
 	}
+	user := token.Claims.(*credential).Username
+	json.NewEncoder(w).Encode(fmt.Sprintf("%s Dashboard", user))
+}
+
+func register(w http.ResponseWriter, r *http.Request) {
+	util.InfoPrint(1, fmt.Sprintf("New Request %s", r.URL.Path))
+	var data models.User
+	timeNow := time.Now()
+	util.InfoPrint(1, "Reading request body")
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		util.InfoPrint(5, err.Error())
+		badRequest(w)
+		return
+	}
+
+	hassPassword := md5.Sum([]byte(data.Password))
+	data.Password = fmt.Sprintf("%x", hassPassword)
+	data.LastLogin = &timeNow
+
+	var dataCount int64
+	user := database.DB.Model(&models.User{})
+	user.Count(&dataCount)
+	data.Id = int(dataCount + 1)
+	if err := database.DB.Create(&data).Error; err != nil {
+		isUname, _ := regexp.MatchString(".*duplicate.*username.*", err.Error())
+		isEmail, _ := regexp.MatchString(".*duplicate.*email.*", err.Error())
+		if isUname {
+			response := responseParam{
+				W:      w,
+				Body:   respToByte("error", "Username has been used by another account", http.StatusBadRequest),
+				Status: http.StatusBadRequest,
+			}
+			responseFormatter(response, "")
+			return
+		} else if isEmail {
+			response := responseParam{
+				W:      w,
+				Body:   respToByte("error", "Email has been used by another account", http.StatusBadRequest),
+				Status: http.StatusBadRequest,
+			}
+			responseFormatter(response, "")
+			return
+		} else {
+			response := responseParam{
+				W:      w,
+				Body:   respToByte("error", "Can't create account right now", http.StatusBadRequest),
+				Status: http.StatusBadRequest,
+			}
+			responseFormatter(response, "")
+			return
+		}
+	} else {
+		msg := fmt.Sprintf("User %s has been created", data.Username)
+		response := responseParam{
+			W:      w,
+			Body:   respToByte("success", msg, http.StatusOK),
+			Status: http.StatusOK,
+		}
+		responseFormatter(response, "")
+		return
+	}
+}
+
+func info(w http.ResponseWriter, r *http.Request) {
+	util.InfoPrint(3, fmt.Sprintf("New Request %s", r.URL.Path))
+	token, err := inspectToken(w, r)
+	if err {
+		return
+	}
 	user := token.Claims.(*credential)
-	json.NewEncoder(w).Encode(fmt.Sprintf("%x Dashboard", user))
+
+	response := responseParam{
+		W:      w,
+		Body:   respToByte("success", user, http.StatusAccepted),
+		Status: http.StatusAccepted,
+	}
+	responseFormatter(response, "")
 }

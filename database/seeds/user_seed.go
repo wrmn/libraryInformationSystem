@@ -1,8 +1,6 @@
 package seeds
 
 import (
-	"crypto/md5"
-	"fmt"
 	"librarySysfo/database"
 	"librarySysfo/database/models"
 	"librarySysfo/util"
@@ -23,7 +21,7 @@ func userSeed() {
 			Id:        c + 1,
 			Username:  gofakeit.Gamertag(),
 			Email:     gofakeit.Email(),
-			Password:  fmt.Sprintf("%x", md5.Sum([]byte("12312312"))),
+			Password:  "f5bb0c8de146c67b44babbf4e6584cc0",
 			LastLogin: &now,
 		})
 	}

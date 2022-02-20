@@ -14,12 +14,20 @@ import (
 )
 
 func createToken(data models.User) (t string, e error) {
+	isEmployee := false
+	if data.Employee.EmployeeNumber != "" {
+		isEmployee = true
+	}
 	claims := credential{
-		data.Id,
-		data.Username,
-		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * time.Second)),
+		Id:         data.Id,
+		Username:   data.Username,
+		IsEmployee: isEmployee,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
 		},
+	}
+	if isEmployee {
+		claims.Division = data.Employee.Division
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -42,6 +50,10 @@ func createRefreshToken(data tokenCred) (token string, e error) {
 }
 
 func validateToken(bearerToken string) (token *jwt.Token, err error) {
+	if len(bearerToken) < 1 {
+		err = errors.New("empty")
+		return
+	}
 	tokenString := strings.Split(bearerToken, " ")[1]
 	token, err = jwt.ParseWithClaims(tokenString, &credential{}, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
@@ -49,7 +61,7 @@ func validateToken(bearerToken string) (token *jwt.Token, err error) {
 	return
 }
 
-func validateRefreshToken(model tokenCred) (models.User, error) {
+func validateRefreshToken(model tokenCred, uname credential) (models.User, error) {
 	token, err := jwt.Parse(model.RefreshToken, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -81,6 +93,10 @@ func validateRefreshToken(model tokenCred) (models.User, error) {
 	}
 
 	user.Username = payload["username"].(string)
+	if user.Username != uname.Username && uname.Id != user.Id {
+		err = errors.New("invalid user token for user")
+		return user, err
+	}
 
 	return user, nil
 }
@@ -91,7 +107,17 @@ func inspectToken(w http.ResponseWriter, r *http.Request) (token *jwt.Token, isE
 	bearerToken := r.Header.Get("Authorization")
 	refresh := r.Header.Get("X-Refresh-Token")
 	token, err := validateToken(bearerToken)
-
+	if err != nil && err.Error() == "empty" {
+		response := responseParam{
+			W:      w,
+			Body:   respToByte("error", "Token Required", http.StatusUnauthorized),
+			Status: http.StatusUnauthorized,
+		}
+		responseFormatter(response, "")
+		isErr = true
+		return
+	}
+	uname := token.Claims.(*credential)
 	isErr = false
 
 	if errors.As(err, &ve) && refresh != "" {
@@ -101,11 +127,11 @@ func inspectToken(w http.ResponseWriter, r *http.Request) (token *jwt.Token, isE
 			RefreshToken: refresh,
 		}
 
-		user, err := validateRefreshToken(creds)
+		user, err := validateRefreshToken(creds, *uname)
 		if err != nil {
 			response := responseParam{
 				W:      w,
-				Body:   respToByte("error", "invalid refresh token", http.StatusUnauthorized),
+				Body:   respToByte("error", "Invalid refresh token", http.StatusUnauthorized),
 				Status: http.StatusUnauthorized,
 			}
 			responseFormatter(response, "")
@@ -120,19 +146,25 @@ func inspectToken(w http.ResponseWriter, r *http.Request) (token *jwt.Token, isE
 			return
 		}
 		w.Header().Add("X-New-Token", newToken)
-
-	}
-
-	if err != nil {
+		return
+	} else if err != nil {
 		if err == jwt.ErrSignatureInvalid {
 			unAuthorized(w)
 			isErr = true
+		} else if refresh == "" {
+			response := responseParam{
+				W:      w,
+				Body:   respToByte("error", "Access Token is expire!", http.StatusUnauthorized),
+				Status: http.StatusUnauthorized,
+			}
+			responseFormatter(response, "")
+			isErr = true
+			return
 		} else {
 			badRequest(w)
 			isErr = true
 		}
 		return
 	}
-
 	return
 }

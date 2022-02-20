@@ -38,15 +38,26 @@ func EnvReader() error {
 
 // Get database connection string
 func GetDbSource() (string, string) {
+	var source string
 	c := getDbConfig()
-	source := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-		c.Username,
-		c.Password,
-		c.Host,
-		c.Port,
-		c.Database,
-	)
+	switch c.Connection {
+	case "mysql":
+		source = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+			c.Username,
+			c.Password,
+			c.Host,
+			c.Port,
+			c.Database,
+		)
+	case "psql":
+		source = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta",
+			c.Host,
+			c.Username,
+			c.Password,
+			c.Database,
+			c.Port)
 
+	}
 	b, err := json.Marshal(c)
 	if err != nil {
 		ErrFatal(err, "")

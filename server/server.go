@@ -18,7 +18,9 @@ func Serve() {
 	port := fmt.Sprintf(":%s", os.Getenv(("SERVICE_PORT")))
 
 	r.HandleFunc("/auth/login", login).Methods("POST")
+	r.HandleFunc("/auth/register", register).Methods("POST")
 
+	r.HandleFunc("/auth/info", info).Methods("GET")
 	r.HandleFunc("/book", allBook).Methods("GET")
 	r.HandleFunc("/me", dashboard).Methods("GET")
 	r.NotFoundHandler = notFoundHandler()

@@ -49,7 +49,7 @@ func memberSeed() {
 			Name:          gofakeit.Name(),
 			Gender:        util.Gender[rand.Intn(2)],
 			PlaceOfBirth:  gofakeit.Address().City,
-			DateOfBirth:   birthDate,
+			DateOfBirth:   birthDate.Format(util.Dmy),
 			Address1:      address.Street,
 			Address2:      &address2,
 			Profession:    rand.Intn(8) + 1,

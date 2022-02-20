@@ -15,8 +15,10 @@ type response struct {
 var key []byte
 
 type credential struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
+	Id         int    `json:"id"`
+	Username   string `json:"username"`
+	IsEmployee bool   `json:"isEmployee"`
+	Division   int    `json:division,omitempty`
 	jwt.RegisteredClaims
 }
 
@@ -30,15 +32,39 @@ type responseParam struct {
 	Body   []byte
 	Status int
 }
-type user struct {
-	Id       int
+
+type userIn struct {
 	Username string
-	Email    string
 	Password string
-	// LastLogin datatypes.Date
-	// CreatedAt datatypes.Date
-	// UpdatedAt datatypes.Date
-	// DeletedAt datatypes.Date
+}
+
+type accountRegis struct {
+	AccountData accountData `json:"account"`
+	RegisData   regisData   `json:"data"`
+}
+
+type accountData struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type regisData struct {
+	Name          string `json:"name"`
+	Gender        string `json:"gender"`
+	PlaceOfBirth  string `json:"placeOfBirth"`
+	DateOfBirth   string `json:"dateOfBirth"`
+	Address1      string `json:"address1"`
+	Address2      string `json:"address2"`
+	Profession    int    `json:"profession"`
+	Institution   string `json:"institution"`
+	PhoneNo       string `json:"phoneNo"`
+	IsWhatsapp    bool   `json:"isWhatsapp"`
+	IdentityNo    string `json:"identityNo"`
+	IdentityType  int    `json:"identityType"`
+	IdentityFile  string `json:"identityFile"`
+	PhotoFile     string `json:"photoFile"`
+	AgreementFile string `json:"agreementFile"`
 }
 
 type book struct {
