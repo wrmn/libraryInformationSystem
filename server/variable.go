@@ -68,15 +68,19 @@ type regisData struct {
 }
 
 type book struct {
-	Id             int
-	RegistrationId int
-	SerialNumber   int
-	DdcNo          string
-	DdcOrder       int
-	Title          string
-	Author         string
-	Publisher      string
-	Availability   bool
-	Status         int
-	Price          int
+	Id             int    `json:"id"`
+	RegistrationId int    `json:"registrationId"`
+	SerialNumber   int    `json:"serialNumber"`
+	DdcNo          string `json:"ddcNo"`
+	DdcOrder       int    `json:"ddcOrder"`
+	Title          string `json:"title"`
+	Author         string `json:"author"`
+	Publisher      string `json:"publisher"`
+	Availability   bool   `json:"availability"`
+	Status         int    `json:"status"`
+	Price          int    `json:"price"`
+	CoverFile      string `json:"coverFile"`
+}
+
+type memberCheckin struct {
 }

@@ -19,9 +19,14 @@ func Serve() {
 
 	r.HandleFunc("/auth/login", login).Methods("POST")
 	r.HandleFunc("/auth/register", register).Methods("POST")
-
 	r.HandleFunc("/auth/info", info).Methods("GET")
+
 	r.HandleFunc("/book", allBook).Methods("GET")
+	r.HandleFunc("/book/{id}", getBook).Methods("GET")
+
+	r.HandleFunc("/checkin/member", checkinMember).Methods("POST")
+	r.HandleFunc("/checkin/guest", checkinGuest).Methods("POST")
+
 	r.HandleFunc("/me", dashboard).Methods("GET")
 	r.NotFoundHandler = notFoundHandler()
 	r.MethodNotAllowedHandler = notAllowedHandler()

@@ -7,5 +7,5 @@ type Guest struct {
 	Address     string  `json:"address" gorm:"type:varchar(96);not null"`
 	Profession  int     `json:"profession" gorm:"type:int;size:32;not null"`
 	Institution string  `json:"institution" gorm:"type:varchar(64); not null"`
-	Visitor     Visitor `gorm:"foreignkey:GuestId;references:Id"`
+	Visitor     Visitor `json:"visitor" gorm:"foreignkey:GuestId;references:Id"`
 }

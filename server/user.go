@@ -96,8 +96,8 @@ func register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hassPassword := md5.Sum([]byte(data.Password))
-	data.Password = fmt.Sprintf("%x", hassPassword)
+	hashPassword := md5.Sum([]byte(data.Password))
+	data.Password = fmt.Sprintf("%x", hashPassword)
 	data.LastLogin = &timeNow
 
 	var dataCount int64

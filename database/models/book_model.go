@@ -15,6 +15,7 @@ type Book struct {
 	Availability   bool        `json:"availability" gorm:"not null"`
 	Status         int         `json:"status" gorm:"type:int;size:32;not null"`
 	Price          int         `json:"price" gorm:"type:int;size:32;not null"`
+	CoverFile      string      `json:"cover" gorm:"type:varchar(24);not null"`
 	AssetRecord    AssetRecord `gorm:"foreignkey:RegistrationId"`
 	Ddc            Ddc         `gorm:"foreignkey:DdcNo"`
 	Borrow         []Borrow    `gorm:"foreignKey:BookId;association_foreign_key:Id"`

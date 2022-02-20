@@ -45,7 +45,9 @@ func bookSeed() {
 			Author:         fmt.Sprintf("%s %s", gofakeit.FirstName(), gofakeit.Word()),
 			Publisher:      fmt.Sprintf("%s %s", gofakeit.LastName(), gofakeit.Word()),
 			Availability:   true,
+			Status:         rand.Intn(5) + 1,
 			Price:          (rand.Intn(250) + 50) * 1000,
+			CoverFile:      "default.jpg",
 		}
 		database.DB.Create(&data)
 	}
